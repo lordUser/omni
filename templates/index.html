@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Orders</h2>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="order">Create order</button>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" id="modal_id">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create order</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="number" class="col-form-label">Number:</label>
+            <input type="text" class="form-control" id="number">
+          </div>
+          <div class="mb-3">
+            <label for="where_from" class="col-form-label">Where From:</label>
+            <input type="text" class="form-control" id="where_from">
+          </div>
+          <div class="mb-3">
+            <label for="where_to" class="col-form-label">Where To:</label>
+            <input type="text" class="form-control" id="where_to">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="submit" type="submit" name="submit" value="Submit" class="btn btn-primary">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr>
+  {% for order in orders %}
+    <th scope="row">{{ order.number }}</th>
+    <td>{{ order.status }}</td>
+{% endfor %}
+    </tr>
+  </tbody>
+</table>
+{% endblock content %}
+{% block extra_js %}
+<script>
+    let createOrderForm = document.getElementById("modal_id");
+    createOrderForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let number = document.getElementById("number");
+    let where_from = document.getElementById("where_from");
+    let where_to = document.getElementById("where_to");
+    let url = "http://localhost:8001/api/orders/"
+    let dataToSend = JSON.stringify({"number": number, "where_from": where_from, "where_to": where_to});
+    // handle submit
+    fetch("http://localhost:8001/api/orders/", {
+    credentials: "same-origin",
+    mode: "same-origin",
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    body: dataToSend
+})
+    .then(resp => {
+        if (resp.status === 200) {
+            return resp.json()
+        } else {
+            console.log("Status: " + resp.status)
+            return Promise.reject("server")
+        }
+    })
+    .then(dataJson => {
+        dataReceived = JSON.parse(dataJson)
+    })
+    .catch(err => {
+        if (err === "server") return
+        console.log(err)
+    })
+
+console.log(`Received: ${dataReceived}`)
+    });
+</script>
+{% endblock %}

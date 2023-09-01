@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd /omni/
+/omni/venv/bin/python3.11 /omni/manage.py migrate \
+&& /omni/venv/bin/python3.11 /omni/manage.py runserver 8001
